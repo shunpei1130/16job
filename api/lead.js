@@ -53,7 +53,7 @@ export default async function handler(req, res) {
     }
 
     const resendKey = process.env.RESEND_API_KEY;
-    const to = process.env.LEAD_TO_EMAIL || "s.hasegawa1130@gmail.com";
+    const to = process.env.LEAD_TO_EMAIL || "info.mobbymobbymobby@gmail.com";
     const from = process.env.LEAD_FROM_EMAIL || "Shukatsu診断 <onboarding@resend.dev>";
 
     if (!resendKey) {

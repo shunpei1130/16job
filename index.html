@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>就活キャラ診断</title>
+  <style>
+    :root {
+      /* Apple-esque Palette */
+      --bg: #fbfbfd; /* 背景：ほんのりグレーがかった白 */
+      --surface: #ffffff; /* カード背景：純白 */
+      --text-main: #1d1d1f; /* メインテキスト：ほぼ黒 */
+      --text-sub: #86868b; /* サブテキスト：グレー */
+      --accent: #0071e3; /* アクセント：Apple Blue */
+      --accent-soft: #e8f2ff; /* 薄い青 */
+      --line: #d2d2d7; /* 境界線 */
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-lg: 0 12px 30px rgba(0,0,0,0.08);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --danger: #ff3b30;
+    }
+
+    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+    
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+
+    .wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #0071e3, #42a5f5);
+      box-shadow: 0 4px 10px rgba(0,113,227,0.3);
+    }
+    .title h1 { font-size: 18px; margin: 0; font-weight: 600; }
+    .title p { margin: 0; color: var(--text-sub); font-size: 12px; }
+
+    /* Buttons */
+    button {
+      border: 1px solid transparent;
+      background: rgba(0,0,0,0.05);
+      color: var(--text-main);
+      padding: 10px 18px;
+      border-radius: 999px; /* Pill shape */
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    button:hover { background: rgba(0,0,0,0.08); transform: translateY(-1px); }
+    button:active { transform: scale(0.98); }
+    
+    button.primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,113,227,0.25);
+    }
+    button.primary:hover { background: #0077ed; box-shadow: 0 6px 16px rgba(0,113,227,0.35); }
+    
+    button.danger { color: var(--danger); background: rgba(255,59,48,0.05); }
+    button.danger:hover { background: rgba(255,59,48,0.1); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Panels & Cards */
+    .panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+    @media (max-width: 600px) {
+      .panel { padding: 24px 16px; }
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 8px;
+    }
+    .big {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 16px;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+    }
+    .text-body { font-size: 15px; color: var(--text-sub); }
+
+    /* Progress Bar */
+    .progress-wrap { margin: 20px 0; }
+    .progress-track {
+      height: 6px;
+      background: #f0f0f5;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .progress-meta {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--text-sub); margin-bottom: 6px; font-weight: 500;
+    }
+
+    /* Questions (4 Options) */
+    .qCard {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #f0f0f5;
+    }
+    .qCard:last-child { border-bottom: none; margin-bottom: 10px; }
+    .qText { font-size: 16px; font-weight: 600; margin: 0 0 16px; }
+    
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* 7択に変更 */
+      gap: 10px;
+    }
+    @media (max-width: 500px) {
+      .options-grid { grid-template-columns: 1fr 1fr; gap: 8px; } /* スマホは2列x2行 */
+    }
+
+    .opt-btn {
+      position: relative;
+    }
+    .opt-btn input { display: none; }
+    .opt-btn label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 4px;
+      background: #f5f5f7;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      height: 100%;
+      min-height: 64px;
+      text-align: center;
+    }
+    .opt-btn label .t { font-size: 12px; font-weight: 600; color: var(--text-sub); line-height: 1.2; }
+    
+    /* Checked State */
+    .opt-btn input:checked + label {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .opt-btn input:checked + label .t { color: var(--accent); }
+
+    /* Results */
+    .result-hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .char-image-placeholder {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 1 / 1;
+      background: #f0f0f5;
+      border-radius: 24px;
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-sub);
+      font-size: 13px;
+      border: 1px dashed #d2d2d7;
+      overflow: hidden; /* 画像が入った時にはみ出さないように */
+    }
+    .char-image-placeholder img {
+        width: 100%; height: 100%; object-fit: cover; display: none; /* 画像指定時はblockに */
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    @media (max-width: 700px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .info-card {
+      background: #f5f5f7;
+      padding: 20px;
+      border-radius: 16px;
+    }
+    .info-card h3 { margin: 0 0 12px; font-size: 15px; color: var(--text-main); }
+    .info-card ul { margin: 0; padding-left: 20px; font-size: 13px; color: var(--text-main); }
+    .info-card li { margin-bottom: 6px; }
+
+    /* Axis Bars */
+    /* Axis Indicator */
+    .axis-row { margin-bottom: 18px; }
+    .axis-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; display: block; }
+    .axis-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-sub); margin-bottom: 6px; }
+    .axis-meta { display:flex; justify-content: space-between; gap: 10px; font-size: 11px; color: var(--text-sub); margin-top: 6px; }
+    .axis-track {
+      height: 10px;
+      background: #e5e5ea;
+      border-radius: 999px;
+      position: relative;
+      overflow: visible;
+    }
+    .axis-center {
+      position:absolute;
+      left:50%;
+      top:50%;
+      width: 2px;
+      height: 14px;
+      background: rgba(0,0,0,0.10);
+      transform: translate(-50%, -50%);
+      border-radius: 2px;
+    }
+    .axis-dot {
+      position:absolute;
+      top:50%;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border: 3px solid #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+    details.axis-details { margin-top: 8px; }
+    details.axis-details summary { cursor:pointer; color: var(--accent); font-size: 12px; font-weight: 600; }
+    .axis-breakdown {
+      margin-top: 10px;
+      background: #f5f5f7;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 12px;
+      color: var(--text-main);
+    }
+    .axis-breakdown .row {
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .axis-breakdown .row:last-child { border-bottom: none; }
+    .axis-breakdown .q { flex: 1; color: var(--text-main); }
+    .axis-breakdown .a { width: 108px; text-align:right; color: var(--text-sub); white-space: nowrap; }
+    .axis-breakdown .dir { width: 44px; text-align:right; font-weight: 700; }
+
+
+    /* Utility */
+    .hidden { display: none; }
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 40px;
+    }
+  
+    /* 7択サークルUI */
+    .likert7{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      padding: 10px 0 6px;
+      flex-wrap: nowrap;
+    }
+    .likert-end{
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 84px;
+      white-space: nowrap;
+    }
+    .likert-end.left{ color:#2f9e73; }
+    .likert-end.right{ color:#7b5aa6; }
+
+    .likert-btn{
+      appearance:none;
+      -webkit-appearance:none;
+      border: 3px solid rgba(0,0,0,0.25);
+      background: transparent;
+      border-radius: 999px;
+      cursor: pointer;
+      padding: 0;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition: transform 80ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .likert-btn[data-i="1"], .likert-btn[data-i="7"] { width: 76px; height: 76px; }
+    .likert-btn[data-i="2"], .likert-btn[data-i="6"] { width: 58px; height: 58px; }
+    .likert-btn[data-i="3"], .likert-btn[data-i="5"] { width: 44px; height: 44px; }
+    .likert-btn[data-i="4"] { width: 30px; height: 30px; }
+
+    .likert-btn.left  { border-color: rgba(47,158,115,0.85); }
+    .likert-btn.mid   { border-color: rgba(140,140,148,0.65); }
+    .likert-btn.right { border-color: rgba(123,90,166,0.85); }
+
+    .likert-btn.selected{
+      box-shadow: 0 0 0 6px rgba(0,113,227,0.12);
+      border-color: rgba(0,113,227,0.65);
+    }
+    .likert-btn:active{ transform: scale(0.98); }
+
+    @media (max-width: 420px){
+      .likert7{ gap: 10px; flex-wrap: wrap; }
+      .likert-end{ min-width: auto; }
+      .likert-btn[data-i="1"], .likert-btn[data-i="7"] { width: 64px; height: 64px; }
+      .likert-btn[data-i="2"], .likert-btn[data-i="6"] { width: 52px; height: 52px; }
+      .likert-btn[data-i="3"], .likert-btn[data-i="5"] { width: 40px; height: 40px; }
+      .likert-btn[data-i="4"] { width: 28px; height: 28px; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <div class="title">
+          <h1>就活キャラ診断</h1>
+          <p>あなたの勝ち筋と適職タイプ</p>
+        </div>
+      </div>
+      <div>
+        <button class="danger" id="btnReset" style="font-size:11px;">リセット</button>
+      </div>
+    </header>
+
+    <main id="app"></main>
+
+    <footer>
+      <p>※本診断はプロトタイプです。結果は端末にのみ保存されます。</p>
+    </footer>
+  </div>
+
+  <script>
+    /***********************
+     * Data & Logic
+     ***********************/
+    const AXES = {
+      A: { key:"A", name:"情報の集め方", left:"読む（一次情報）", right:"話す（対話）" },
+      B: { key:"B", name:"得意な環境", left:"安定・仕組み", right:"変化・カオス" },
+      C: { key:"C", name:"動機の源泉", left:"意義・人", right:"合理・成果" },
+      D: { key:"D", name:"進め方", left:"計画的", right:"柔軟・即興" }
+    };
+
+    const ANS_LABEL = {1:"全く違う", 2:"やや違う", 3:"ややそう思う", 4:"強くそう思う"};
+
+
+    // 7択用にスコア調整: 1(Strongly Disagree) .. 4(Strongly Agree)
+    // Reverseなら: 5 - answer
+    const QUESTIONS = [
+      // A: 読む（一次情報） vs 話す（対話）
+      {id:"A1", axis:"A", text:"企業研究はまず公式情報（採用サイト・IRなど）を読み込む", reverse:false},
+      {id:"A2", axis:"A", text:"人に会う前に、自分で調べ尽くしてから臨みたい", reverse:false},
+      {id:"A3", axis:"A", text:"文章や資料を読むほうが理解が深まる", reverse:false},
+      {id:"A4", axis:"A", text:"疑問はまず検索・資料で確認してから質問する", reverse:false},
+      {id:"A5", axis:"A", text:"考えはメモや文章化で整理することが多い", reverse:false},
+      {id:"A6", axis:"A", text:"人に話してみると考えがまとまってくる", reverse:true},
+      {id:"A7", axis:"A", text:"資料より、働く人の“生の声”のほうが判断材料になる", reverse:true},
+      {id:"A8", axis:"A", text:"まず人に会って聞きながら、情報を埋めていくタイプだ", reverse:true},
+      {id:"A9", axis:"A", text:"自分で調べるより、詳しい人に聞くほうが早いと思う", reverse:true},
+      {id:"A10", axis:"A", text:"会話の中でその場で質問がどんどん湧いてくる", reverse:true},
+
+      // B: 安定・仕組み vs 変化・カオス
+      {id:"B1", axis:"B", text:"役割と評価基準が明確なほうが力を出せる", reverse:false},
+      {id:"B2", axis:"B", text:"手順やルールが整っていると安心する", reverse:false},
+      {id:"B3", axis:"B", text:"研修や育成の仕組みがある環境が好きだ", reverse:false},
+      {id:"B4", axis:"B", text:"前例や型があるほうが改善しやすい", reverse:false},
+      {id:"B5", axis:"B", text:"変化が少ない環境のほうが集中できる", reverse:false},
+      {id:"B6", axis:"B", text:"前例のないテーマほどワクワクする", reverse:true},
+      {id:"B7", axis:"B", text:"ルールがなくても自分で型を作って進められる", reverse:true},
+      {id:"B8", axis:"B", text:"方針が頻繁に変わる環境でもむしろ燃える", reverse:true},
+      {id:"B9", axis:"B", text:"0→1で立ち上げる仕事をやりたい", reverse:true},
+      {id:"B10", axis:"B", text:"整っていない環境を自分で整えるのが好きだ", reverse:true},
+
+      // C: 意義・人 vs 合理・成果
+      {id:"C1", axis:"C", text:"「誰の課題を解くか」が明確だとやる気が出る", reverse:false},
+      {id:"C2", axis:"C", text:"理念やミッションへの共感を重視する", reverse:false},
+      {id:"C3", axis:"C", text:"感謝されたり役に立てると頑張れる", reverse:false},
+      {id:"C4", axis:"C", text:"相手の気持ちや納得感を大事にして判断したい", reverse:false},
+      {id:"C5", axis:"C", text:"自分の価値観に反する仕事は避けたい", reverse:false},
+      {id:"C6", axis:"C", text:"成果（数字・KPI）が出ないなら意味が薄いと感じる", reverse:true},
+      {id:"C7", axis:"C", text:"条件（給与・成長機会）を合理的に比較して選びたい", reverse:true},
+      {id:"C8", axis:"C", text:"データやロジックを優先して意思決定したい", reverse:true},
+      {id:"C9", axis:"C", text:"勝てる確度が高い選択を取りたい", reverse:true},
+      {id:"C10", axis:"C", text:"“好き嫌い”よりリターンで決めることが多い", reverse:true},
+
+      // D: 計画的 vs 柔軟・即興
+      {id:"D1", axis:"D", text:"締切よりかなり前から準備する", reverse:false},
+      {id:"D2", axis:"D", text:"ToDoや段取りを作ると安心する", reverse:false},
+      {id:"D3", axis:"D", text:"面接の想定問答は事前に用意しておく", reverse:false},
+      {id:"D4", axis:"D", text:"リスクを洗い出して対策してから動く", reverse:false},
+      {id:"D5", axis:"D", text:"計画が立つと迷いが減る", reverse:false},
+      {id:"D6", axis:"D", text:"細かい計画より、まず動いて途中で調整する", reverse:true},
+      {id:"D7", axis:"D", text:"状況を見て優先順位を入れ替えるのが得意だ", reverse:true},
+      {id:"D8", axis:"D", text:"準備が不十分でも勢いで切り抜けられる", reverse:true},
+      {id:"D9", axis:"D", text:"予定が崩れてもすぐ別案を出せる", reverse:true},
+      {id:"D10", axis:"D", text:"直前の追い込みでパフォーマンスが上がる", reverse:true},
+    ];
+
+    const CHARACTERS = {
+      "LLLL": {name:"静かなる参謀", summary:"徹底的な調査と計画で、組織を裏から支える知性派。"},
+      "LLLR": {name:"調整のスペシャリスト", summary:"情報を整理し、相手に合わせて柔軟に伝える架け橋。"},
+      "LLRL": {name:"堅実な実務家", summary:"要件を整理し、着実に実行して成果を積み上げる。"},
+      "LLRR": {name:"現場の改善職人", summary:"マニュアルを守りつつ、現場の詰まりを柔軟に直す。"},
+      "LRLL": {name:"未来を描く建築家", summary:"変化を読み解き、新しい仕組みを着実に作り上げる。"},
+      "LRLR": {name:"アイデアハンター", summary:"広く情報を集め、面白い仮説を次々と試す発想家。"},
+      "LRRL": {name:"戦略的チャレンジャー", summary:"勝ち筋を冷静に分析し、成長領域へ果敢に挑む。"},
+      "LRRR": {name:"高速プロトタイパー", summary:"まずはやってみる。失敗から学び、高速で正解に近づく。"},
+      "RLLL": {name:"信頼のファシリテーター", summary:"人の話を引き出し、丁寧に合意を作って前進させる。"},
+      "RLLR": {name:"愛されサポーター", summary:"その場の空気を読み、関わる全員が心地よい環境を作る。"},
+      "RLRL": {name:"頼れるリーダー", summary:"周りを巻き込みながら、目標に向かって着実に進む。"},
+      "RLRR": {name:"現場のムードメーカー", summary:"トラブルも笑顔で解決。チームの熱量を上げるエンジン。"},
+      "RRLL": {name:"ビジョンを語る翻訳者", summary:"大きな夢を、誰もが理解できる言葉と計画に落とす。"},
+      "RRLR": {name:"巻き込み型の冒険家", summary:"「面白そう！」で周りを巻き込み、変化の渦を作る。"},
+      "RRRL": {name:"成長プロデューサー", summary:"人と資源を集め、最短距離で成果を叩き出す実力派。"},
+      "RRRR": {name:"即興のファンタジスタ", summary:"どんな状況でも瞬時に最適解を出し、周りを驚かせる。"},
+    };
+
+    const STORAGE_KEY = "shukatsu_diag_apple_v1";
+    const PAGE_SIZE = 5; // 40問 ÷ 5問 = 8ページ
+
+    const state = {
+  step: "intro", // intro | quiz | gate | result
+  page: 0,
+  answers: {},
+  profile: { name: "", email: "" }, // 追加
+};
+
+
+    /***********************
+     * Functions
+     ***********************/
+    function loadState(){
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) Object.assign(state, JSON.parse(raw));
+      } catch(e){}
+    }
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function resetState(){
+      state.step = "intro";
+      state.page = 0;
+      state.answers = {};
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
+
+    
+    function computeResult(){
+      // 7択: 1..7（左=そう思う(強) 〜 右=そう思わない(強)）
+      // スコアリング方針:
+      // - 端の回答(1/7)は「確信が強い」とみなし、重みを上げる
+      // - 非線形変換で中間(3/5)の影響を圧縮し、端が相対的に効きやすくする
+      // - reverse:true（右側を肯定する文）は (8-ans) で反転し、「左寄り=プラス」に統一
+      // - 軸内で回答が割れている（相殺）場合は、過剰に断定しないよう少しだけ中立へ寄せる
+      const SCALE = 7;
+      const MID = 4;          // 中央
+      const MAX_DEV = 3;      // MIDからの最大偏差（1 or 7）
+      const GAMMA = 1.35;     // 非線形：大きいほど中間が弱まり、端が相対的に強くなる
+      const EXTREME_BONUS = 0.35; // 端(1/7)の重み +35%
+      const COHERENCE_SHRINK = 0.20; // 相殺が強い軸は最大20%だけ中立へ
+
+
+      const raw = {A:0, B:0, C:0, D:0};        // 左(+)/右(-)
+      const absRaw = {A:0, B:0, C:0, D:0};     // 絶対値（相殺の計算）
+      const maxRaw = {A:0, B:0, C:0, D:0};     // 正規化用
+      const coherenceByAxis = {A:0, B:0, C:0, D:0};
+      const breakdown = {A:[], B:[], C:[], D:[]};
+      const allAnswers = [];
+
+      
+      const weightOf = (ansRaw) => {
+        const isExtreme = (ansRaw === 1 || ansRaw === 7);
+        return isExtreme ? (1 + EXTREME_BONUS) : 1;
+      };
+
+      const shapeAns = (ansAdj) => {
+        // ansAdj: 1..7（左=1, 右=7） / 返り値: -1..+1（左=+）
+        const centered = (MID - ansAdj);     // -3..+3（左=+）
+        const t = centered / MAX_DEV;        // -1..+1
+        const mag = Math.min(1, Math.abs(t));
+        const shaped = Math.sign(t) * Math.pow(mag, GAMMA);
+        return shaped; // -1..+1
+      };
+
+      for(const q of QUESTIONS){
+        const ansRaw = state.answers[q.id];  // 1..7
+        if(!ansRaw) continue;
+
+        allAnswers.push(ansRaw);
+
+        // reverse:true（右側を肯定する文）は反転（8-ans）
+        const ansAdj = q.reverse ? (SCALE + 1 - ansRaw) : ansRaw;
+
+        const shaped = shapeAns(ansAdj);
+        const w = weightOf(ansRaw) * (q.importance ?? 1);
+
+        const contrib = w * shaped;          // 左寄り:+ / 右寄り:-
+        raw[q.axis] += contrib;
+        absRaw[q.axis] += Math.abs(contrib);
+        maxRaw[q.axis] += w;                 // shapedの最大が1なので w を積む
+
+        breakdown[q.axis].push({ id:q.id, text:q.text, ans: ansRaw, contrib });
+      }
+
+const means = {};
+      const hard = {};
+      const norm = {};     // -1..1（+が左寄り）
+      const pos = {};      // 0..100（左=0, 中央=50, 右=100）
+      const leftPct = {};  // 0..100（左の強さ）
+      const decisiveness = {}; // 0..1（中立からどれだけ離れているか）
+
+      ["A","B","C","D"].forEach(k => {
+        const denom = maxRaw[k] || 1;
+
+        // coherence: 1=一貫、0=左右が拮抗（相殺）
+        const coherence = absRaw[k] ? (Math.abs(raw[k]) / absRaw[k]) : 0;
+        coherenceByAxis[k] = coherence;
+
+        // 相殺が強いほど少し中立へ（両方の良さを持つケースを尊重）
+        const adjusted = raw[k] * (1 - COHERENCE_SHRINK * (1 - coherence));
+
+        norm[k] = Math.max(-1, Math.min(1, adjusted / denom));
+        means[k] = MID + norm[k] * MAX_DEV; // 1..4に戻す
+        hard[k] = norm[k] > 0 ? "L" : "R";
+
+        pos[k] = Math.max(0, Math.min(100, 50 - norm[k] * 50));
+        leftPct[k] = Math.round((norm[k] + 1) * 50);
+        decisiveness[k] = Math.min(1, Math.abs(norm[k]));
+      });
+
+      // 直線回答（同じ選択肢に偏る）検知：精度が落ちやすい
+      let straightLine = false;
+      if(allAnswers.length){
+        const freq = {1:0,2:0,3:0,4:0};
+        allAnswers.forEach(a => freq[a]++);
+        const maxF = Math.max(freq[1],freq[2],freq[3],freq[4]);
+        straightLine = (maxF / allAnswers.length) >= 0.80;
+      }
+
+      const code = hard.A + hard.B + hard.C + hard.D;
+      return { means, hard, code, norm, pos, leftPct, coherenceByAxis, breakdown, decisiveness, straightLine, char: CHARACTERS[code] };
+    }
+
+    // --- Rendering ---
+
+
+    const app = document.getElementById("app");
+    document.getElementById("btnReset").onclick = () => {
+      if(confirm("最初からやり直しますか？")) resetState();
+    };
+
+    function render(){
+      window.scrollTo(0,0);
+      if(state.step === "intro") renderIntro();
+      else if(state.step === "quiz") renderQuiz();
+      else renderResult();
+    }
+
+    function renderIntro(){
+      const count = Object.keys(state.answers).length;
+      app.innerHTML = `
+        <div class="panel fade-in" style="text-align:center; padding: 60px 20px;">
+          <p class="kicker">就活自己分析</p>
+          <h2 class="big">あなたの「持ち味」を<br>4つの軸で言語化します。</h2>
+          <p class="text-body" style="max-width:400px; margin:0 auto 30px;">
+            直感で選ぶ40問の質問から、あなたの強みが活きる環境や、ES・面接でのアピール方法を提案します。
+          </p>
+          <button class="primary" id="btnStart" style="padding:16px 32px; font-size:16px;">
+            ${count > 0 ? "診断を再開する" : "診断をはじめる"}
+          </button>
+          ${count > 0 ? `<p style="font-size:12px; color:#86868b; margin-top:16px;">${count} / 40問 回答済み</p>` : ""}
+        </div>
+        
+        <div class="card-grid">
+          <div class="info-card">
+            <h3>情報収集のスタイル</h3>
+            <div class="text-body" style="font-size:12px;">自分で読み込む vs 人と話す</div>
+          </div>
+          <div class="info-card">
+            <h3>好む環境</h3>
+            <div class="text-body" style="font-size:12px;">安定・仕組み vs 変化・カオス</div>
+          </div>
+          <div class="info-card">
+            <h3>モチベーション</h3>
+            <div class="text-body" style="font-size:12px;">意義・共感 vs 合理・成果</div>
+          </div>
+          <div class="info-card">
+            <h3>仕事の進め方</h3>
+            <div class="text-body" style="font-size:12px;">計画的 vs 臨機応変</div>
+          </div>
+        </div>
+      `;
+      document.getElementById("btnStart").onclick = () => {
+        state.step = "quiz";
+        // 未回答の最初のページへ
+        const idx = QUESTIONS.findIndex(q => !state.answers[q.id]);
+        state.page = idx >= 0 ? Math.floor(idx / PAGE_SIZE) : 0;
+        render();
+      };
+    }
+
+    function renderQuiz(){
+      const start = state.page * PAGE_SIZE;
+      const currentQs = QUESTIONS.slice(start, start + PAGE_SIZE);
+      const totalPage = Math.ceil(QUESTIONS.length / PAGE_SIZE);
+      const progress = Math.round((Object.keys(state.answers).length / QUESTIONS.length) * 100);
+
+      const qHtml = currentQs.map((q, i) => {
+        const val = state.answers[q.id];
+        return `
+          <div class="qCard fade-in" style="animation-delay: ${i*0.05}s">
+            <div class="kicker" style="color:#86868b; margin-bottom:4px;">Q${start+i+1}</div>
+            <p class="qText">${q.text}</p>
+            <div class="likert7">
+              <div class="likert-end left">そう思う</div>
+              ${[1,2,3,4,5,6,7].map(n => {
+                const side = n<=3 ? "left" : (n===4 ? "mid" : "right");
+                const sel = (val === n) ? "selected" : "";
+                return `<button type="button" class="likert-btn ${side} ${sel}" data-i="${n}" data-qid="${q.id}" data-val="${n}" aria-label="選択肢 ${n}"></button>`;
+              }).join("")}
+              <div class="likert-end right">そう思わない</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      app.innerHTML = `
+        <div class="panel">
+          <div class="progress-wrap">
+            <div class="progress-meta">
+              <span>進行状況</span>
+              <span>${progress}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${progress}%"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:30px;">
+            ${qHtml}
+          </div>
+
+          <div style="display:flex; justify-content:space-between; margin-top:30px;">
+            <button id="btnPrev" ${state.page===0 ? "disabled":""}>戻る</button>
+            <button class="primary" id="btnNext">
+              ${state.page === totalPage - 1 ? "結果を見る" : "次へ"}
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Event Listeners
+      currentQs.forEach(q => {
+        document.querySelectorAll(`button.likert-btn[data-qid="${q.id}"]`).forEach(btn => {
+          btn.onclick = (e) => {
+            const val = parseInt(btn.dataset.val);
+            state.answers[q.id] = val;
+
+            // 選択状態の見た目更新
+            document.querySelectorAll(`button.likert-btn[data-qid="${q.id}"]`).forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+
+            saveState();
+
+            // プログレスバーだけ更新
+            const p = Math.round((Object.keys(state.answers).length / QUESTIONS.length) * 100);
+            document.querySelector(".progress-fill").style.width = p + "%";
+            document.querySelector(".progress-meta span:last-child").innerText = p + "%";
+          };
+        });
+      });
+document.getElementById("btnPrev").onclick = () => {
+        state.page--;
+        render();
+      };
+
+      document.getElementById("btnNext").onclick = () => {
+        // Validation
+        const missing = currentQs.find(q => !state.answers[q.id]);
+        if(missing){
+          alert("まだ回答していない項目があります");
+          return;
+        }
+        if(state.page < totalPage - 1){
+          state.page++;
+          render();
+        } else {
+          state.step = "result";
+          render();
+        }
+      };
+    }
+    async function submitLead(payload){
+  const r = await fetch("/api/lead", {
+    method: "POST",
+    headers: { "Content-Type":"application/json" },
+    body: JSON.stringify(payload)
+  });
+  const data = await r.json().catch(()=> ({}));
+  if(!r.ok) throw new Error(data?.error || "送信に失敗しました");
+  return data;
+}
+
+function renderGate(){
+  // 回答が揃ってる前提だが、念のため
+  const answered = Object.keys(state.answers).length;
+  if(answered < QUESTIONS.length){
+    state.step = "quiz";
+    saveState();
+    render();
+    return;
+  }
+
+  const res = computeResult(); // 結果はここで計算（表示はまだしない）
+
+  app.innerHTML = `
+    <div class="panel fade-in">
+      <p class="kicker">結果の閲覧には登録が必要です</p>
+      <h2 class="big">名前とメールアドレスを入力してください</h2>
+      <p class="text-body" style="margin-top:-6px;">
+        入力後すぐに診断結果を表示します。
+      </p>
+
+      <div style="margin-top:22px; display:grid; gap:12px; max-width:520px;">
+        <div>
+          <div style="font-size:12px; color:var(--text-sub); margin-bottom:6px;">お名前</div>
+          <input id="regName" type="text" placeholder="例）山田 太郎"
+            style="width:100%; padding:14px 14px; border-radius:14px; border:1px solid var(--line); background:#fff; font-size:14px;">
+        </div>
+        <div>
+          <div style="font-size:12px; color:var(--text-sub); margin-bottom:6px;">メールアドレス</div>
+          <input id="regEmail" type="email" placeholder="example@gmail.com"
+            style="width:100%; padding:14px 14px; border-radius:14px; border:1px solid var(--line); background:#fff; font-size:14px;">
+        </div>
+
+        <label style="display:flex; gap:10px; align-items:flex-start; font-size:12px; color:var(--text-sub);">
+          <input id="regConsent" type="checkbox" style="margin-top:3px;">
+          <span>入力した情報を連絡・改善のために保存することに同意します。</span>
+        </label>
+
+        <div id="regErr" style="display:none; color:var(--danger); font-size:12px;"></div>
+
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <button id="btnGateBack" style="background:transparent; color:#86868b;">戻る</button>
+          <button class="primary" id="btnGateGo" style="flex:1; padding:14px 18px;">結果を見る</button>
+        </div>
+
+        <div style="margin-top:10px; font-size:11px; color:var(--text-sub);">
+          送信される内容：名前、メール、診断TYPE（${res.code}）、各軸の比率（A〜D）
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 既に入力があれば反映
+  const nameEl = document.getElementById("regName");
+  const emailEl = document.getElementById("regEmail");
+  nameEl.value = state.profile?.name || "";
+  emailEl.value = state.profile?.email || "";
+
+  document.getElementById("btnGateBack").onclick = () => {
+    state.step = "quiz";
+    saveState();
+    render();
+  };
+
+  document.getElementById("btnGateGo").onclick = async () => {
+    const errEl = document.getElementById("regErr");
+    errEl.style.display = "none";
+
+    const name = (nameEl.value || "").trim();
+    const email = (emailEl.value || "").trim();
+    const consent = document.getElementById("regConsent").checked;
+
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if(!name){ errEl.textContent = "名前を入力してください"; errEl.style.display="block"; return; }
+    if(!emailOk){ errEl.textContent = "メールアドレスを正しく入力してください"; errEl.style.display="block"; return; }
+    if(!consent){ errEl.textContent = "同意にチェックしてください"; errEl.style.display="block"; return; }
+
+    const btn = document.getElementById("btnGateGo");
+    btn.disabled = true;
+    btn.textContent = "送信中…";
+
+    try{
+      // 送信データ（必要に応じて増減）
+      const payload = {
+        name,
+        email,
+        type: res.code,
+        axes: res.leftPct,   // A,B,C,Dが0..100
+        createdAt: new Date().toISOString(),
+      };
+
+      await submitLead(payload);
+
+      // 登録情報保存（次回スキップ用）
+      state.profile = { name, email };
+      state.step = "result";
+      saveState();
+      render();
+    }catch(e){
+      errEl.textContent = e?.message || "送信に失敗しました";
+      errEl.style.display="block";
+      btn.disabled = false;
+      btn.textContent = "結果を見る";
+    }
+  };
+}
+
+
+    function renderResult(){
+      const res = computeResult();
+      const char = res.char;
+      
+      // ES・面接アドバイスの生成
+      const isL = (k) => res.hard[k] === "L";
+      const esTip = isL("C") 
+        ? "「なぜやるか（原体験・価値観）」を中心に添え、共感を生むストーリーで構成する。"
+        : "「どう成果を出すか（課題・解決策・結果）」を数値や比較を用いて論理的に構成する。";
+        
+      const interviewTip = isL("D")
+        ? "結論ファーストに加え、プロセス（工夫した点・判断基準）を丁寧に話すと信頼されやすい。"
+        : "臨機応変な対応力をアピール。想定外のトラブルをどう乗り越えたかを楽しそうに話す。";
+
+      const oneStep = isL("A")
+        ? "採用サイト/IR/社員インタビューを読み、刺さったキーワードを3つメモする。"
+        : "OB訪問・説明会・SNSのDM等で、1人に“質問を1つ”投げて会話を作る。";
+
+      app.innerHTML = `
+        <div class="panel fade-in">
+          <div class="result-hero">
+            <p class="kicker">診断結果</p>
+            <h2 class="big" style="font-size:28px;">${char.name}</h2>
+            <p class="text-body" style="color:var(--text-main); font-weight:500;">${char.summary}</p>
+            ${res.straightLine ? `<p class="text-body" style="margin-top:10px; color:#6e6e73; font-size:13px;">
+              ※回答が同じ選択肢に偏っているため、傾向が測りにくい可能性があります。迷ったら直感で選び直すと精度が上がります。
+            </p>` : ``}
+
+            
+            <div class="char-image-placeholder">
+               <span>ここにキャラクター画像が入ります</span> 
+            </div>
+            
+            <div style="display:inline-block; background:#f0f0f5; padding:6px 16px; border-radius:20px; font-size:12px; font-family:monospace; color:#86868b;">
+              TYPE: ${res.code}
+            </div>
+          </div>
+
+          <div style="margin-top:40px;">
+            <p class="kicker" style="margin-bottom:16px;">4つの軸の傾向</p>
+            ${["A","B","C","D"].map(k => {
+              const ax = AXES[k];
+              const left = res.leftPct[k];
+              const right = 100 - left;
+              const coh = Math.round((res.coherenceByAxis[k] || 0) * 100);
+              const rows = (res.breakdown[k] || []).map(it => {
+                const dir = it.contrib > 0.06 ? "←" : (it.contrib < -0.06 ? "→" : "・");
+                return `<div class="row"><div class="q">${it.id}. ${it.text}</div><div class="dir">${dir}</div><div class="a">${ANS_LABEL[it.ans] || it.ans}</div></div>`;
+              }).join("");
+              return `
+                <div class="axis-row">
+                  <span class="axis-name">${ax.name}</span>
+                  <div class="axis-labels">
+                    <span>${ax.left}</span>
+                    <span>${ax.right}</span>
+                  </div>
+                  <div class="axis-track">
+                    <div class="axis-center"></div>
+                    <div class="axis-dot" style="left:${res.pos[k]}%;"></div>
+                  </div>
+                  <div class="axis-meta">
+                    <span>${ax.left} ${left}%</span>
+                    <span>一貫度 ${coh}%</span>
+                    <span>${ax.right} ${right}%</span>
+                  </div>
+                  <details class="axis-details">
+                    <summary>内訳を見る</summary>
+                    <div class="axis-breakdown">${rows}</div>
+                  </details>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+
+        <div class="card-grid fade-in" style="animation-delay:0.2s;">
+          <div class="info-card">
+            <h3>📝 ESの書き方</h3>
+            <p class="text-body">${esTip}</p>
+          </div>
+          <div class="info-card">
+            <h3>🗣 面接のヒント</h3>
+            <p class="text-body">${interviewTip}</p>
+          </div>
+          <div class="info-card">
+            <h3>💡 今日の一歩</h3>
+            <p class="text-body">${oneStep}</p>
+          </div>
+          <div class="info-card">
+            <h3>🏢 合う環境の傾向</h3>
+            <p class="text-body">
+              ${isL("B") ? "役割や評価制度が整った、安定してスキルを磨ける環境。" : "変化が激しく、自分の裁量でルールを作っていける環境。"}
+            </p>
+          </div>
+        </div>
+        
+        <div style="text-align:center; margin-top:40px;">
+           <button id="btnBack" style="color:#86868b; background:transparent;">回答を見直す</button>
+        </div>
+      `;
+
+      document.getElementById("btnBack").onclick = () => {
+        state.step = "quiz";
+        state.page = 0;
+        render();
+      };
+    }
+
+    // Start
+    loadState();
+    render();
+
+  </script>
+</body>
+</html>

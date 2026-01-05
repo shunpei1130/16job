@@ -602,6 +602,7 @@ const means = {};
       window.scrollTo(0,0);
       if(state.step === "intro") renderIntro();
       else if(state.step === "quiz") renderQuiz();
+      else if(state.step === "gate") renderGate();
       else renderResult();
     }
 
@@ -734,7 +735,7 @@ document.getElementById("btnPrev").onclick = () => {
           state.page++;
           render();
         } else {
-          state.step = "result";
+          state.step = "gate";
           render();
         }
       };

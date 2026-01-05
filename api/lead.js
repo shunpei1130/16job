@@ -1,35 +1,26 @@
 import { Resend } from "resend";
 
-export default async function handler(req, res) {
+export const POST = async (request) => {
   // ログ: リクエスト情報
+  const url = request.url;
+  const headers = Object.fromEntries(request.headers.entries());
+  let body = {};
+  
+  try {
+    body = await request.json();
+  } catch (e) {
+    console.error("[LEAD API] Failed to parse request body:", e);
+  }
+
   console.log("[LEAD API] Request received:", {
-    method: req.method,
-    url: req.url,
-    headers: req.headers,
-    body: req.body,
+    method: "POST",
+    url: url,
+    headers: headers,
+    body: body,
     timestamp: new Date().toISOString()
   });
 
-  // CORS対応
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    console.log("[LEAD API] OPTIONS request handled");
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    console.error("[LEAD API] Method not allowed:", req.method);
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
-
   try {
-    // Vercelではreq.bodyが既にパースされている場合がある
-    const body = req.body || {};
-    console.log("[LEAD API] Request body:", JSON.stringify(body, null, 2));
-
     const name = String(body.name || "").trim();
     const email = String(body.email || "").trim();
     const type = String(body.type || "").trim();
@@ -41,15 +32,15 @@ export default async function handler(req, res) {
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!name) {
       console.error("[LEAD API] Validation error: name is required");
-      return res.status(400).json({ error: "name is required" });
+      return Response.json({ error: "name is required" }, { status: 400 });
     }
     if (!emailOk) {
       console.error("[LEAD API] Validation error: email is invalid", email);
-      return res.status(400).json({ error: "email is invalid" });
+      return Response.json({ error: "email is invalid" }, { status: 400 });
     }
     if (!type) {
       console.error("[LEAD API] Validation error: type is required");
-      return res.status(400).json({ error: "type is required" });
+      return Response.json({ error: "type is required" }, { status: 400 });
     }
 
     const resendKey = process.env.RESEND_API_KEY;
@@ -58,7 +49,7 @@ export default async function handler(req, res) {
 
     if (!resendKey) {
       console.error("[LEAD API] RESEND_API_KEY is missing");
-      return res.status(500).json({ error: "RESEND_API_KEY is missing" });
+      return Response.json({ error: "RESEND_API_KEY is missing" }, { status: 500 });
     }
 
     console.log("[LEAD API] Sending email via Resend...");
@@ -86,13 +77,46 @@ export default async function handler(req, res) {
 
     console.log("[LEAD API] Email sent successfully:", emailResult);
 
-    return res.status(200).json({ ok: true });
+    return Response.json(
+      { ok: true },
+      {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
+    );
   } catch (e) {
     console.error("[LEAD API] Error occurred:", {
       message: e?.message,
       stack: e?.stack,
       error: e
     });
-    return res.status(500).json({ error: e?.message || "Internal Error" });
+    return Response.json(
+      { error: e?.message || "Internal Error" },
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
+    );
   }
-}
+};
+
+// OPTIONSリクエスト用のハンドラー（CORSプリフライト）
+export const OPTIONS = async () => {
+  console.log("[LEAD API] OPTIONS request handled");
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+};

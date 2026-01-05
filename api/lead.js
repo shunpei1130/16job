@@ -1,10 +1,6 @@
-// api/lead.js
-// Vercel Serverless Function: POST /api/lead
-// 受け取った登録データを Resend 経由で Gmail に送信します（①の最短構成）
+import { Resend } from "resend";
 
-const { Resend } = require("resend");
-
-function readJsonBody(req) {
+function getBody(req) {
   return new Promise((resolve, reject) => {
     if (req.body && typeof req.body === "object") return resolve(req.body);
     let data = "";
@@ -20,14 +16,11 @@ function readJsonBody(req) {
   });
 }
 
-module.exports = async (req, res) => {
-  if (req.method !== "POST") {
-    res.statusCode = 405;
-    return res.json({ error: "Method Not Allowed" });
-  }
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).json({ error: "Method Not Allowed" });
 
   try {
-    const body = await readJsonBody(req);
+    const body = await getBody(req);
 
     const name = String(body.name || "").trim();
     const email = String(body.email || "").trim();
@@ -41,10 +34,10 @@ module.exports = async (req, res) => {
     if (!type) return res.status(400).json({ error: "type is required" });
 
     const resendKey = process.env.RESEND_API_KEY;
-    if (!resendKey) return res.status(500).json({ error: "RESEND_API_KEY is missing" });
-
     const to = process.env.LEAD_TO_EMAIL || "s.hasegawa1130@gmail.com";
     const from = process.env.LEAD_FROM_EMAIL || "Shukatsu診断 <onboarding@resend.dev>";
+
+    if (!resendKey) return res.status(500).json({ error: "RESEND_API_KEY is missing" });
 
     const resend = new Resend(resendKey);
 
@@ -65,11 +58,11 @@ module.exports = async (req, res) => {
       to,
       subject,
       text,
-      replyTo: email, // Gmailで「返信」すると入力メールに返せる
+      replyTo: email
     });
 
     return res.status(200).json({ ok: true });
   } catch (e) {
     return res.status(500).json({ error: e?.message || "Internal Error" });
   }
-};
+}

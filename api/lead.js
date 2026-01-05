@@ -1,26 +1,22 @@
 import { Resend } from "resend";
 
-function getBody(req) {
-  return new Promise((resolve, reject) => {
-    if (req.body && typeof req.body === "object") return resolve(req.body);
-    let data = "";
-    req.on("data", (c) => (data += c));
-    req.on("end", () => {
-      if (!data) return resolve({});
-      try {
-        resolve(JSON.parse(data));
-      } catch {
-        reject(new Error("Invalid JSON"));
-      }
-    });
-  });
-}
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method Not Allowed" });
+  // CORS対応
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
 
   try {
-    const body = await getBody(req);
+    // Vercelではreq.bodyが既にパースされている場合がある
+    const body = req.body || {};
 
     const name = String(body.name || "").trim();
     const email = String(body.email || "").trim();

@@ -45,15 +45,43 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 16px;
     }
     .brand { display: flex; align-items: center; gap: 12px; }
     .logo {
       width: 40px; height: 40px; border-radius: 10px;
       background: linear-gradient(135deg, #0071e3, #42a5f5);
       box-shadow: 0 4px 10px rgba(0,113,227,0.3);
+      cursor: pointer;
     }
-    .title h1 { font-size: 18px; margin: 0; font-weight: 600; }
+    .title h1 { font-size: 18px; margin: 0; font-weight: 600; cursor: pointer; }
     .title p { margin: 0; color: var(--text-sub); font-size: 12px; }
+    .nav {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .nav a {
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .nav a:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    .nav a.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    @media (max-width: 600px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .nav { width: 100%; justify-content: flex-start; }
+    }
 
     /* Buttons */
     button {
@@ -198,7 +226,7 @@
       overflow: hidden; /* 画像が入った時にはみ出さないように */
     }
     .char-image-placeholder img {
-        width: 100%; height: 100%; object-fit: cover; display: none; /* 画像指定時はblockに */
+        width: 100%; height: 100%; object-fit: cover; display: block;
     }
 
     .card-grid {
@@ -361,6 +389,64 @@
       .likert-btn[data-i="4"] { width: 22px; height: 22px; }
     }
 
+    /* Character List Page */
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    @media (max-width: 600px) {
+      .char-grid { grid-template-columns: 1fr; }
+    }
+    .char-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.8);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .char-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    .char-card-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      background: #f0f0f5;
+    }
+    .char-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .char-card-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: var(--text-main);
+    }
+    .char-card-type {
+      display: inline-block;
+      background: #f0f0f5;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+    .char-card-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin: 0;
+    }
+
   </style>
 </head>
 <body>
@@ -368,13 +454,17 @@
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo"></div>
+        <div class="logo" id="logoHome"></div>
         <div class="title">
-          <h1>就活キャラ診断</h1>
+          <h1 id="titleHome">就活キャラ診断</h1>
           <p>あなたの勝ち筋と適職タイプ</p>
         </div>
       </div>
-      <div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <nav class="nav">
+          <a href="#" id="navDiagnosis" class="active">診断</a>
+          <a href="#" id="navCharacters">キャラ一覧</a>
+        </nav>
         <button class="danger" id="btnReset" style="font-size:11px;">リセット</button>
       </div>
     </header>
@@ -453,29 +543,29 @@
     ];
 
     const CHARACTERS = {
-      "LLLL": {name:"静かなる参謀", summary:"徹底的な調査と計画で、組織を裏から支える知性派。"},
-      "LLLR": {name:"調整のスペシャリスト", summary:"情報を整理し、相手に合わせて柔軟に伝える架け橋。"},
-      "LLRL": {name:"堅実な実務家", summary:"要件を整理し、着実に実行して成果を積み上げる。"},
-      "LLRR": {name:"現場の改善職人", summary:"マニュアルを守りつつ、現場の詰まりを柔軟に直す。"},
-      "LRLL": {name:"未来を描く建築家", summary:"変化を読み解き、新しい仕組みを着実に作り上げる。"},
-      "LRLR": {name:"アイデアハンター", summary:"広く情報を集め、面白い仮説を次々と試す発想家。"},
-      "LRRL": {name:"戦略的チャレンジャー", summary:"勝ち筋を冷静に分析し、成長領域へ果敢に挑む。"},
-      "LRRR": {name:"高速プロトタイパー", summary:"まずはやってみる。失敗から学び、高速で正解に近づく。"},
-      "RLLL": {name:"信頼のファシリテーター", summary:"人の話を引き出し、丁寧に合意を作って前進させる。"},
-      "RLLR": {name:"愛されサポーター", summary:"その場の空気を読み、関わる全員が心地よい環境を作る。"},
-      "RLRL": {name:"頼れるリーダー", summary:"周りを巻き込みながら、目標に向かって着実に進む。"},
-      "RLRR": {name:"現場のムードメーカー", summary:"トラブルも笑顔で解決。チームの熱量を上げるエンジン。"},
-      "RRLL": {name:"ビジョンを語る翻訳者", summary:"大きな夢を、誰もが理解できる言葉と計画に落とす。"},
-      "RRLR": {name:"巻き込み型の冒険家", summary:"「面白そう！」で周りを巻き込み、変化の渦を作る。"},
-      "RRRL": {name:"成長プロデューサー", summary:"人と資源を集め、最短距離で成果を叩き出す実力派。"},
-      "RRRR": {name:"即興のファンタジスタ", summary:"どんな状況でも瞬時に最適解を出し、周りを驚かせる。"},
+      "LLLL": {name:"Notion建築士", summary:"徹底的な調査と計画で、組織を裏から支える知性派。", description:"一次情報を読み込み、構造化してから動く。安定した仕組みの中で力が出て、判断軸は「意義・人」。計画を切って着実に詰めるので、ESも面接も準備で勝つ。"},
+      "LLLR": {name:"高IQサボり魔", summary:"情報を整理し、相手に合わせて柔軟に伝える架け橋。", description:"情報はまず読み倒して最短ルートを作る。安定環境で効率化がハマり、モチベは「意義・人」寄りだが、進め方は即興で省エネ。準備は要点だけ押さえて、残りは現場で最適化する。"},
+      "LLRL": {name:"タスク完遂ガチ勢", summary:"要件を整理し、着実に実行して成果を積み上げる。", description:"読み込み→段取り→実行の精度が高い。安定した環境で、役割と手順を守りつつ「意義・人」を軸に粘れる。計画通りに完遂して信頼を取りにいく職人気質。"},
+      "LLRR": {name:"デスク環境沼の住人", summary:"マニュアルを守りつつ、現場の詰まりを柔軟に直す。", description:"一次情報で状況把握し、必要ならその場でやり方を変える。安定・仕組みが好きだが、進め方は柔軟で現場調整が得意。人の納得感も大事にしつつ、詰まりを即座に直す。"},
+      "LRLL": {name:"0→1（ゼロイチ）起業家", summary:"変化を読み解き、新しい仕組みを着実に作り上げる。", description:"読み込みで仮説を作り、カオス環境で形にしていく。動機は「意義・人」起点で、計画を引きながら大きく動かす。新規事業や立ち上げで、構想と実行を両立する。"},
+      "LRLR": {name:"特定班ディガー", summary:"広く情報を集め、面白い仮説を次々と試す発想家。", description:"調べ尽くして確度を上げ、変化のある場で試行する。意義や人への共感が強いが、進め方は即興でフットワークも軽い。「一次情報×検証」で深掘り型の強さが出る。"},
+      "LRRL": {name:"ソロラン最強勢", summary:"勝ち筋を冷静に分析し、成長領域へ果敢に挑む。", description:"一次情報で勝ち筋を読み、カオス環境でも自走する。モチベは「意義・人」寄りだが、進め方は計画的で崩れにくい。孤独耐性が高く、成果を積み上げて説得する。"},
+      "LRRR": {name:"人柱テスター", summary:"まずはやってみる。失敗から学び、高速で正解に近づく。", description:"読み込みはするが、答えは現場で作るタイプ。変化の中で学習し、意義に共感できるなら突っ込める。準備より検証が早く、失敗から改善して勝ちに近づく。"},
+      "RLLL": {name:"避難所のモデレーター", summary:"人の話を引き出し、丁寧に合意を作って前進させる。", description:"会話で情報を集め、安定した枠組みの中で合意を作る。判断軸は「意義・人」で、計画的に場を整える。面接では対話力と調整力が刺さる。"},
+      "RLLR": {name:"全肯定ご自愛勢", summary:"その場の空気を読み、関わる全員が心地よい環境を作る。", description:"人と話しながら空気を読み、安定環境で安心感を提供する。意義・人を優先しつつ、進め方は柔軟で無理をしない。チームの温度を保ちながら前に進める。"},
+      "RLRL": {name:"界隈の神（解釈一致）", summary:"周りを巻き込みながら、目標に向かって着実に進む。", description:"対話で本音とニーズを掴み、変化のある場でも筋道を立てられる。動機は「意義・人」で、計画的に巻き込みながら進める。共感を“構造”に落として推進できる。"},
+      "RLRR": {name:"バイブス係長", summary:"トラブルも笑顔で解決。チームの熱量を上げるエンジン。", description:"会話で状況を取りにいき、カオス環境でノリ良く突破する。意義・人で動くが、計画に縛られず即興で回す。ムードメーカーなのに、実は修羅場耐性が高い。"},
+      "RRLL": {name:"言語化の魔術師", summary:"大きな夢を、誰もが理解できる言葉と計画に落とす。", description:"対話から素材を拾い、変化の中でも意味を見失わない。意義・人を軸に、計画的に言葉と道筋に落とす。ESはストーリー設計、面接は納得感で勝つ。"},
+      "RRLR": {name:"フッ軽インフルエンサー", summary:"「面白そう！」で周りを巻き込み、変化の渦を作る。", description:"人から情報を集め、変化の波にすぐ乗る。動機は「意義・人」寄りで、進め方は即興。まず動いて発信し、反応を見て方向修正する。"},
+      "RRRL": {name:"垢抜けプロデューサー", summary:"人と資源を集め、最短距離で成果を叩き出す実力派。", description:"対話で現場を掴み、カオス環境でも計画を引いて前進する。合理・成果を軸に意思決定し、勝てる形に整えるのが得意。伸び代を見抜いて改善を設計する。"},
+      "RRRR": {name:"脳内ワンダーランド", summary:"どんな状況でも瞬時に最適解を出し、周りを驚かせる。", description:"会話で刺激を取り込み、カオス環境で即興的に形にする。合理・成果で最適解を選び、スピード重視で試す。アイデア量と決断の速さで場を動かす。"},
     };
 
     const STORAGE_KEY = "shukatsu_diag_apple_v1";
     const PAGE_SIZE = 5; // 40問 ÷ 5問 = 8ページ
 
     const state = {
-  step: "intro", // intro | quiz | gate | result
+  step: "intro", // intro | quiz | gate | result | characters
   page: 0,
   answers: {},
   profile: { name: "", email: "" }, // 追加
@@ -607,11 +697,39 @@ const means = {};
       if(confirm("最初からやり直しますか？")) resetState();
     };
 
+    // Navigation handlers
+    document.getElementById("logoHome").onclick = () => {
+      state.step = "intro";
+      render();
+    };
+    document.getElementById("titleHome").onclick = () => {
+      state.step = "intro";
+      render();
+    };
+    document.getElementById("navDiagnosis").onclick = (e) => {
+      e.preventDefault();
+      state.step = "intro";
+      render();
+    };
+    document.getElementById("navCharacters").onclick = (e) => {
+      e.preventDefault();
+      state.step = "characters";
+      render();
+    };
+
+    function updateNavActive() {
+      const isDiagnosis = ["intro", "quiz", "gate", "result"].includes(state.step);
+      document.getElementById("navDiagnosis").classList.toggle("active", isDiagnosis);
+      document.getElementById("navCharacters").classList.toggle("active", state.step === "characters");
+    }
+
     function render(){
       window.scrollTo(0,0);
+      updateNavActive();
       if(state.step === "intro") renderIntro();
       else if(state.step === "quiz") renderQuiz();
       else if(state.step === "gate") renderGate();
+      else if(state.step === "characters") renderCharacters();
       else renderResult();
     }
 
@@ -888,6 +1006,35 @@ function renderGate(){
   };
 }
 
+    function renderCharacters(){
+      const charKeys = Object.keys(CHARACTERS).sort();
+      const charHtml = charKeys.map(code => {
+        const char = CHARACTERS[code];
+        return `
+          <div class="char-card fade-in">
+            <div class="char-card-image">
+              <img src="cha/${code.toLowerCase()}.png" alt="${char.name}" onerror="this.parentElement.style.background='#f0f0f5'; this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:#86868b;font-size:12px;\\'>画像なし</div>';">
+            </div>
+            <div class="char-card-type">TYPE: ${code}</div>
+            <h3 class="char-card-name">${char.name}</h3>
+            <p class="char-card-desc">${char.description}</p>
+          </div>
+        `;
+      }).join("");
+
+      app.innerHTML = `
+        <div class="panel fade-in">
+          <p class="kicker">全16タイプ</p>
+          <h2 class="big">キャラクター一覧</h2>
+          <p class="text-body" style="margin-bottom:0;">
+            4つの軸の組み合わせで生まれる、16種類のキャラクタータイプをご紹介します。
+          </p>
+        </div>
+        <div class="char-grid">
+          ${charHtml}
+        </div>
+      `;
+    }
 
     function renderResult(){
       const res = computeResult();
@@ -919,7 +1066,8 @@ function renderGate(){
 
             
             <div class="char-image-placeholder">
-               <span>ここにキャラクター画像が入ります</span> 
+               <img src="cha/${res.code.toLowerCase()}.png" alt="${char.name}" onerror="this.style.display='none'; this.parentElement.querySelector('span').style.display='block';">
+               <span style="display:none;">ここにキャラクター画像が入ります</span> 
             </div>
             
             <div style="display:inline-block; background:#f0f0f5; padding:6px 16px; border-radius:20px; font-size:12px; font-family:monospace; color:#86868b;">

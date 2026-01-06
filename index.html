@@ -307,6 +307,7 @@
     .hidden { display: none; }
     .fade-in { animation: fadeIn 0.4s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
     footer {
       text-align: center;
@@ -483,6 +484,116 @@
         line-height: 1.4;
         display: none; /* スマホでは説明文を非表示 */
       }
+    }
+    .char-card-detail-btn {
+      margin-top: 12px;
+      padding: 8px 16px;
+      font-size: 12px;
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      .char-card-detail-btn {
+        margin-top: 4px;
+        padding: 4px 8px;
+        font-size: 9px;
+      }
+    }
+
+    /* Character Detail Modal */
+    .char-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      opacity: 0;
+      animation: fadeIn 0.2s ease forwards;
+    }
+    .char-modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+      transform: scale(0.95);
+      animation: modalSlideIn 0.2s ease forwards;
+    }
+    @media (max-width: 600px) {
+      .char-modal {
+        padding: 24px 16px;
+        max-height: 85vh;
+      }
+    }
+    @keyframes modalSlideIn {
+      to {
+        transform: scale(1);
+      }
+    }
+    .char-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(0,0,0,0.05);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--text-main);
+      transition: background 0.2s;
+    }
+    .char-modal-close:hover {
+      background: rgba(0,0,0,0.1);
+    }
+    .char-modal-image {
+      width: 200px;
+      height: 200px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 0 auto 24px;
+      background: #f0f0f5;
+    }
+    .char-modal-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .char-modal-type {
+      display: inline-block;
+      background: #f0f0f5;
+      padding: 6px 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-family: monospace;
+      color: var(--text-sub);
+      margin-bottom: 16px;
+    }
+    .char-modal-name {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 16px;
+      color: var(--text-main);
+      text-align: center;
+    }
+    .char-modal-desc {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-main);
+      margin: 0;
     }
 
   </style>
@@ -1056,6 +1167,7 @@ function renderGate(){
             <div class="char-card-type">TYPE: ${code}</div>
             <h3 class="char-card-name">${char.name}</h3>
             <p class="char-card-desc">${char.description}</p>
+            <button class="char-card-detail-btn primary" data-char-code="${code}">詳細</button>
           </div>
         `;
       }).join("");
@@ -1072,6 +1184,50 @@ function renderGate(){
           ${charHtml}
         </div>
       `;
+
+      // 詳細ボタンのイベントリスナー
+      document.querySelectorAll('.char-card-detail-btn').forEach(btn => {
+        btn.onclick = () => {
+          const code = btn.dataset.charCode;
+          showCharDetail(code);
+        };
+      });
+    }
+
+    function showCharDetail(code) {
+      const char = CHARACTERS[code];
+      const modalHtml = `
+        <div class="char-modal-overlay" id="charModalOverlay">
+          <div class="char-modal">
+            <button class="char-modal-close" id="charModalClose">×</button>
+            <div class="char-modal-image">
+              <img src="cha/${code.toLowerCase()}.png" alt="${char.name}" onerror="this.parentElement.style.background='#f0f0f5'; this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:#86868b;\\'>画像なし</div>';">
+            </div>
+            <div style="text-align:center;">
+              <div class="char-modal-type">TYPE: ${code}</div>
+              <h2 class="char-modal-name">${char.name}</h2>
+            </div>
+            <p class="char-modal-desc">${char.description}</p>
+          </div>
+        </div>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      
+      const overlay = document.getElementById('charModalOverlay');
+      const closeBtn = document.getElementById('charModalClose');
+      
+      closeBtn.onclick = () => {
+        overlay.style.animation = 'fadeOut 0.2s ease forwards';
+        setTimeout(() => overlay.remove(), 200);
+      };
+      
+      overlay.onclick = (e) => {
+        if (e.target === overlay) {
+          overlay.style.animation = 'fadeOut 0.2s ease forwards';
+          setTimeout(() => overlay.remove(), 200);
+        }
+      };
     }
 
     function renderResult(){

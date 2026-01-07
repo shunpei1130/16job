@@ -840,7 +840,7 @@ const means = {};
       // 直線回答（同じ選択肢に偏る）検知：精度が落ちやすい
       let straightLine = false;
       if(allAnswers.length){
-        const freq = {1:0,2:0,3:0,4:0,5:0,6:0,7:0};
+        const freq = {1:0,2:0,3:0,4:0};
         allAnswers.forEach(a => freq[a]++);
         const maxF = Math.max(freq[1],freq[2],freq[3],freq[4]);
         straightLine = (maxF / allAnswers.length) >= 0.80;

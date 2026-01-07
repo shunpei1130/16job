@@ -621,7 +621,7 @@
     <main id="app"></main>
 
     <footer>
-      <p>※本診断はプロトタイプです。結果は端末にのみ保存されます。</p>
+      <p>※結果は端末にのみ保存されます。</p>
     </footer>
   </div>
 
@@ -648,78 +648,78 @@ function gotoDiagnosisHome(){
       D: { key:"D", name:"進め方", left:"計画的", right:"柔軟・即興" }
     };
 
-    const ANS_LABEL = {1:"全く違う", 2:"やや違う", 3:"ややそう思う", 4:"強くそう思う"};
+    const ANS_LABEL = {1:"全く違う", 2:"やや違う", 3:"ややそう思う", 4:"強くそう思う", 5:"どちらでもない", 6:"どちらでもない", 7:"どちらでもない"};
 
 
     // 7択用にスコア調整: 1(Strongly Disagree) .. 4(Strongly Agree)
     // Reverseなら: 5 - answer
     const QUESTIONS = [
-      // A: 読む（一次情報） vs 話す（対話）
-      {id:"A1", axis:"A", text:"企業研究はまず公式情報（採用サイト・IRなど）を読み込む", reverse:false},
-      {id:"A2", axis:"A", text:"人に会う前に、自分で調べ尽くしてから臨みたい", reverse:false},
-      {id:"A3", axis:"A", text:"文章や資料を読むほうが理解が深まる", reverse:false},
-      {id:"A4", axis:"A", text:"疑問はまず検索・資料で確認してから質問する", reverse:false},
-      {id:"A5", axis:"A", text:"考えはメモや文章化で整理することが多い", reverse:false},
-      {id:"A6", axis:"A", text:"人に話してみると考えがまとまってくる", reverse:true},
-      {id:"A7", axis:"A", text:"資料より、働く人の“生の声”のほうが判断材料になる", reverse:true},
-      {id:"A8", axis:"A", text:"まず人に会って聞きながら、情報を埋めていくタイプだ", reverse:true},
-      {id:"A9", axis:"A", text:"自分で調べるより、詳しい人に聞くほうが早いと思う", reverse:true},
-      {id:"A10", axis:"A", text:"会話の中でその場で質問がどんどん湧いてくる", reverse:true},
+  // A: 読む（一次情報） vs 話す（対話）
+  {id:"A1", axis:"A", text:"人に聞く前に、まず公式情報（採用サイト・IRなど）を読み込む", reverse:false},
+  {id:"A2", axis:"A", text:"人に会って聞く前に、自分で調べ尽くしてから臨みたい", reverse:false},
+  {id:"A3", axis:"A", text:"人に聞くよりも、文章や資料を読むほうが理解が深まる", reverse:false},
+  {id:"A4", axis:"A", text:"人に質問する前に、まず検索・資料で確認してからにしたい", reverse:false},
+  {id:"A5", axis:"A", text:"人に話して整理するよりも、メモや文章化で考えを整理することが多い", reverse:false},
+  {id:"A6", axis:"A", text:"メモで整理するより、人に話してみると考えがまとまってくる", reverse:true},
+  {id:"A7", axis:"A", text:"採用サイトやIRなどの資料より、働く人の“生の声”のほうが判断材料になる", reverse:true},
+  {id:"A8", axis:"A", text:"自分で読み込んでから動くより、まず人に会って聞きながら情報を埋めていくタイプだ", reverse:true},
+  {id:"A9", axis:"A", text:"自分で調べるより、詳しい人に聞くほうが早いと思う", reverse:true},
+  {id:"A10", axis:"A", text:"一人で資料を読むより、会話の中でその場で質問がどんどん湧いてくる", reverse:true},
 
-      // B: 安定・仕組み vs 変化・カオス
-      {id:"B1", axis:"B", text:"役割と評価基準が明確なほうが力を出せる", reverse:false},
-      {id:"B2", axis:"B", text:"手順やルールが整っていると安心する", reverse:false},
-      {id:"B3", axis:"B", text:"研修や育成の仕組みがある環境が好きだ", reverse:false},
-      {id:"B4", axis:"B", text:"前例や型があるほうが改善しやすい", reverse:false},
-      {id:"B5", axis:"B", text:"変化が少ない環境のほうが集中できる", reverse:false},
-      {id:"B6", axis:"B", text:"前例のないテーマほどワクワクする", reverse:true},
-      {id:"B7", axis:"B", text:"ルールがなくても自分で型を作って進められる", reverse:true},
-      {id:"B8", axis:"B", text:"方針が頻繁に変わる環境でもむしろ燃える", reverse:true},
-      {id:"B9", axis:"B", text:"0→1で立ち上げる仕事をやりたい", reverse:true},
-      {id:"B10", axis:"B", text:"整っていない環境を自分で整えるのが好きだ", reverse:true},
+  // B: 安定・仕組み vs 変化・カオス
+  {id:"B1", axis:"B", text:"役割や評価基準が曖昧な環境より、明確な環境のほうが力を出せる", reverse:false},
+  {id:"B2", axis:"B", text:"その場判断が多い環境より、手順やルールが整っている環境のほうが安心する", reverse:false},
+  {id:"B3", axis:"B", text:"育成が丸投げの環境より、研修や育成の仕組みがある環境が好きだ", reverse:false},
+  {id:"B4", axis:"B", text:"ゼロから作るより、前例や型があるほうが改善しやすい", reverse:false},
+  {id:"B5", axis:"B", text:"変化が多い環境より、変化が少ない環境のほうが集中できる", reverse:false},
+  {id:"B6", axis:"B", text:"決まった型の作業より、前例のないテーマほどワクワクする", reverse:true},
+  {id:"B7", axis:"B", text:"ルールが整っていることよりも、自分で型を作って進められることのほうが重要だ", reverse:true},
+  {id:"B8", axis:"B", text:"方針が固定された環境より、方針が頻繁に変わる環境のほうがむしろ燃える", reverse:true},
+  {id:"B9", axis:"B", text:"既存の改善より、0→1で立ち上げる仕事をやりたい", reverse:true},
+  {id:"B10", axis:"B", text:"整った環境に乗るより、整っていない環境を自分で整えるほうが好きだ", reverse:true},
 
-      // C: 意義・人 vs 合理・成果
-      {id:"C1", axis:"C", text:"「誰の課題を解くか」が明確だとやる気が出る", reverse:false},
-      {id:"C2", axis:"C", text:"理念やミッションへの共感を重視する", reverse:false},
-      {id:"C3", axis:"C", text:"感謝されたり役に立てると頑張れる", reverse:false},
-      {id:"C4", axis:"C", text:"相手の気持ちや納得感を大事にして判断したい", reverse:false},
-      {id:"C5", axis:"C", text:"自分の価値観に反する仕事は避けたい", reverse:false},
-      {id:"C6", axis:"C", text:"成果（数字・KPI）が出ないなら意味が薄いと感じる", reverse:true},
-      {id:"C7", axis:"C", text:"条件（給与・成長機会）を合理的に比較して選びたい", reverse:true},
-      {id:"C8", axis:"C", text:"データやロジックを優先して意思決定したい", reverse:true},
-      {id:"C9", axis:"C", text:"勝てる確度が高い選択を取りたい", reverse:true},
-      {id:"C10", axis:"C", text:"“好き嫌い”よりリターンで決めることが多い", reverse:true},
+  // C: 意義・人 vs 合理・成果
+  {id:"C1", axis:"C", text:"数字を追うことより、「誰の課題を解くか」が明確だとやる気が出る", reverse:false},
+  {id:"C2", axis:"C", text:"条件（給与・待遇）より、理念やミッションへの共感を重視する", reverse:false},
+  {id:"C3", axis:"C", text:"数字で評価されることより、感謝されたり役に立てると頑張れる", reverse:false},
+  {id:"C4", axis:"C", text:"合理性を優先するより、相手の気持ちや納得感を大事にして判断したい", reverse:false},
+  {id:"C5", axis:"C", text:"成果が出そうでも、自分の価値観に反する仕事は避けたい", reverse:false},
+  {id:"C6", axis:"C", text:"意義があっても、成果（数字・KPI）が出ないなら意味が薄いと感じる", reverse:true},
+  {id:"C7", axis:"C", text:"共感より、条件（給与・成長機会）を合理的に比較して選びたい", reverse:true},
+  {id:"C8", axis:"C", text:"気持ちや共感より、データやロジックを優先して意思決定したい", reverse:true},
+  {id:"C9", axis:"C", text:"不確実でも面白そうな選択より、勝てる確度が高い選択を取りたい", reverse:true},
+  {id:"C10", axis:"C", text:"“好き嫌い”よりリターンで決めることが多い", reverse:true},
 
-      // D: 計画的 vs 柔軟・即興
-      {id:"D1", axis:"D", text:"締切よりかなり前から準備する", reverse:false},
-      {id:"D2", axis:"D", text:"ToDoや段取りを作ると安心する", reverse:false},
-      {id:"D3", axis:"D", text:"面接の想定問答は事前に用意しておく", reverse:false},
-      {id:"D4", axis:"D", text:"リスクを洗い出して対策してから動く", reverse:false},
-      {id:"D5", axis:"D", text:"計画が立つと迷いが減る", reverse:false},
-      {id:"D6", axis:"D", text:"細かい計画より、まず動いて途中で調整する", reverse:true},
-      {id:"D7", axis:"D", text:"状況を見て優先順位を入れ替えるのが得意だ", reverse:true},
-      {id:"D8", axis:"D", text:"準備が不十分でも勢いで切り抜けられる", reverse:true},
-      {id:"D9", axis:"D", text:"予定が崩れてもすぐ別案を出せる", reverse:true},
-      {id:"D10", axis:"D", text:"直前の追い込みでパフォーマンスが上がる", reverse:true},
-    ];
+  // D: 計画的 vs 柔軟・即興
+  {id:"D1", axis:"D", text:"直前に詰めるより、締切よりかなり前から準備する", reverse:false},
+  {id:"D2", axis:"D", text:"その場で考えるより、ToDoや段取りを作ると安心する", reverse:false},
+  {id:"D3", axis:"D", text:"アドリブで臨むより、面接の想定問答は事前に用意しておく", reverse:false},
+  {id:"D4", axis:"D", text:"走りながら考えるより、リスクを洗い出して対策してから動く", reverse:false},
+  {id:"D5", axis:"D", text:"計画がないまま進めるより、計画が立つと迷いが減る", reverse:false},
+  {id:"D6", axis:"D", text:"細かい計画を固めるより、まず動いて途中で調整する", reverse:true},
+  {id:"D7", axis:"D", text:"計画通りに固定するより、状況を見て優先順位を入れ替えるのが得意だ", reverse:true},
+  {id:"D8", axis:"D", text:"準備万全じゃないと不安になるより、準備が不十分でも勢いで切り抜けられる", reverse:true},
+  {id:"D9", axis:"D", text:"予定が崩れると固まりやすいより、崩れてもすぐ別案を出せる", reverse:true},
+  {id:"D10", axis:"D", text:"前倒しで安定して進めるより、直前の追い込みでパフォーマンスが上がる", reverse:true},
+];
 
     const CHARACTERS = {
-      "LLLL": {name:"Notion建築士", summary:"徹底的な調査と計画で、組織を裏から支える知性派。", description:"一次情報を読み込み、構造化してから動く。安定した仕組みの中で力が出て、判断軸は「意義・人」。計画を切って着実に詰めるので、ESも面接も準備で勝つ。"},
-      "LLLR": {name:"高IQサボり魔", summary:"情報を整理し、相手に合わせて柔軟に伝える架け橋。", description:"情報はまず読み倒して最短ルートを作る。安定環境で効率化がハマり、モチベは「意義・人」寄りだが、進め方は即興で省エネ。準備は要点だけ押さえて、残りは現場で最適化する。"},
-      "LLRL": {name:"タスク完遂ガチ勢", summary:"要件を整理し、着実に実行して成果を積み上げる。", description:"読み込み→段取り→実行の精度が高い。安定した環境で、役割と手順を守りつつ「意義・人」を軸に粘れる。計画通りに完遂して信頼を取りにいく職人気質。"},
-      "LLRR": {name:"デスク環境沼の住人", summary:"マニュアルを守りつつ、現場の詰まりを柔軟に直す。", description:"一次情報で状況把握し、必要ならその場でやり方を変える。安定・仕組みが好きだが、進め方は柔軟で現場調整が得意。人の納得感も大事にしつつ、詰まりを即座に直す。"},
-      "LRLL": {name:"0→1（ゼロイチ）起業家", summary:"変化を読み解き、新しい仕組みを着実に作り上げる。", description:"読み込みで仮説を作り、カオス環境で形にしていく。動機は「意義・人」起点で、計画を引きながら大きく動かす。新規事業や立ち上げで、構想と実行を両立する。"},
-      "LRLR": {name:"特定班ディガー", summary:"広く情報を集め、面白い仮説を次々と試す発想家。", description:"調べ尽くして確度を上げ、変化のある場で試行する。意義や人への共感が強いが、進め方は即興でフットワークも軽い。「一次情報×検証」で深掘り型の強さが出る。"},
-      "LRRL": {name:"ソロラン最強勢", summary:"勝ち筋を冷静に分析し、成長領域へ果敢に挑む。", description:"一次情報で勝ち筋を読み、カオス環境でも自走する。モチベは「意義・人」寄りだが、進め方は計画的で崩れにくい。孤独耐性が高く、成果を積み上げて説得する。"},
-      "LRRR": {name:"人柱テスター", summary:"まずはやってみる。失敗から学び、高速で正解に近づく。", description:"読み込みはするが、答えは現場で作るタイプ。変化の中で学習し、意義に共感できるなら突っ込める。準備より検証が早く、失敗から改善して勝ちに近づく。"},
-      "RLLL": {name:"避難所のモデレーター", summary:"人の話を引き出し、丁寧に合意を作って前進させる。", description:"会話で情報を集め、安定した枠組みの中で合意を作る。判断軸は「意義・人」で、計画的に場を整える。面接では対話力と調整力が刺さる。"},
-      "RLLR": {name:"全肯定ご自愛勢", summary:"その場の空気を読み、関わる全員が心地よい環境を作る。", description:"人と話しながら空気を読み、安定環境で安心感を提供する。意義・人を優先しつつ、進め方は柔軟で無理をしない。チームの温度を保ちながら前に進める。"},
-      "RLRL": {name:"界隈の神（解釈一致）", summary:"周りを巻き込みながら、目標に向かって着実に進む。", description:"対話で本音とニーズを掴み、変化のある場でも筋道を立てられる。動機は「意義・人」で、計画的に巻き込みながら進める。共感を“構造”に落として推進できる。"},
-      "RLRR": {name:"バイブス係長", summary:"トラブルも笑顔で解決。チームの熱量を上げるエンジン。", description:"会話で状況を取りにいき、カオス環境でノリ良く突破する。意義・人で動くが、計画に縛られず即興で回す。ムードメーカーなのに、実は修羅場耐性が高い。"},
-      "RRLL": {name:"言語化の魔術師", summary:"大きな夢を、誰もが理解できる言葉と計画に落とす。", description:"対話から素材を拾い、変化の中でも意味を見失わない。意義・人を軸に、計画的に言葉と道筋に落とす。ESはストーリー設計、面接は納得感で勝つ。"},
-      "RRLR": {name:"フッ軽インフルエンサー", summary:"「面白そう！」で周りを巻き込み、変化の渦を作る。", description:"人から情報を集め、変化の波にすぐ乗る。動機は「意義・人」寄りで、進め方は即興。まず動いて発信し、反応を見て方向修正する。"},
-      "RRRL": {name:"垢抜けプロデューサー", summary:"人と資源を集め、最短距離で成果を叩き出す実力派。", description:"対話で現場を掴み、カオス環境でも計画を引いて前進する。合理・成果を軸に意思決定し、勝てる形に整えるのが得意。伸び代を見抜いて改善を設計する。"},
-      "RRRR": {name:"脳内ワンダーランド", summary:"どんな状況でも瞬時に最適解を出し、周りを驚かせる。", description:"会話で刺激を取り込み、カオス環境で即興的に形にする。合理・成果で最適解を選び、スピード重視で試す。アイデア量と決断の速さで場を動かす。"},
+      "LLLL": {name:"Notion建築士", summary:"徹底的な調査と計画で、組織を裏から支える知性派。", description:"一次情報を読み込み、構造化してから動く。安定した仕組みの中で力が出て、判断軸は「意義・人」。計画を切って着実に詰めるので、ESも面接も準備で勝つ。", strength:"一次情報を読み込み、頭の中のモヤモヤを「構造」にして整理できる。要件定義・手順化・テンプレ化が得意で、チームの再現性を上げる“仕組みの人”。", weakness:"情報を集めすぎて「完成してから出す」になりやすい。正しさと整合性を優先して、スピード勝負の場だと置いていかれることがある。"},
+      "LLLR": {name:"高IQサボり魔", summary:"情報を整理し、相手に合わせて柔軟に伝える架け橋。", description:"情報はまず読み倒して最短ルートを作る。安定環境で効率化がハマり、モチベは「意義・人」寄りだが、進め方は即興で省エネ。準備は要点だけ押さえて、残りは現場で最適化する。", strength:"「最小の労力で最大の成果」を設計できる。面倒なことほどショートカットや自動化を思いつき、周りが気づかない無駄を静かに消す。", weakness:"省エネが強すぎると「本気出してない」に見られることがある。準備を削りすぎて、相手の安心材料（根拠・手順）を出すのが遅れることも。"},
+      "LLRL": {name:"タスク完遂ガチ勢", summary:"要件を整理し、着実に実行して成果を積み上げる。", description:"読み込み→段取り→実行の精度が高い。安定した環境で、役割と手順を守りつつ「意義・人」を軸に粘れる。計画通りに完遂して信頼を取りにいく職人気質。", strength:"締切・品質・手順を守り、最後までやり切る信頼がある。タスクを細分化して詰めるのが上手く、成果が“積み上がる”タイプ。", weakness:"「やり切る」が強すぎて抱え込みやすい。優先順位を変えるより完遂を選び、無駄に疲れる／改善提案が後回しになることがある。"},
+      "LLRR": {name:"デスク環境沼の住人", summary:"マニュアルを守りつつ、現場の詰まりを柔軟に直す。", description:"一次情報で状況把握し、必要ならその場でやり方を変える。安定・仕組みが好きだが、進め方は柔軟で現場調整が得意。人の納得感も大事にしつつ、詰まりを即座に直す。", strength:"詰まりやストレス源を見つけるのが早く、現場のやり方を微調整して回転数を上げられる。改善の手数が多く、実務で差が出る。", weakness:"環境やツールにこだわりすぎて、整うまで動けない瞬間がある。周りからは「そこまで必要？」と見られやすく、説明がないと伝わりにくい。"},
+      "LRLL": {name:"0→1（ゼロイチ）起業家", summary:"変化を読み解き、新しい仕組みを着実に作り上げる。", description:"読み込みで仮説を作り、カオス環境で形にしていく。動機は「意義・人」起点で、計画を引きながら大きく動かす。新規事業や立ち上げで、構想と実行を両立する。", strength:"不確実でも仮説を立て、筋道を作って推進できる。目的（意義）に火がつくと強く、立ち上げ・新規企画で周りを引っ張る。", weakness:"理想や構想が先に立ち、足元の泥臭い運用が苦手になりがち。正解が見えない状態で、周囲の温度差にストレスを感じることも。"},
+      "LRLR": {name:"特定班ディガー", summary:"広く情報を集め、面白い仮説を次々と試す発想家。", description:"調べ尽くして確度を上げ、変化のある場で試行する。意義や人への共感が強いが、進め方は即興でフットワークも軽い。「一次情報×検証」で深掘り型の強さが出る。", strength:"一点突破で深掘りし、裏取りや比較で「本当の論点」を掘り当てる。調べた内容を試しながら更新でき、学習速度が高い。", weakness:"掘りすぎて「結論が遅い」になりやすい。興味の対象が移ると熱量の差が出て、周りが置いていかれることがある。"},
+      "LRRL": {name:"ソロラン最強勢", summary:"勝ち筋を冷静に分析し、成長領域へ果敢に挑む。", description:"一次情報で勝ち筋を読み、カオス環境でも自走する。モチベは「意義・人」寄りだが、進め方は計画的で崩れにくい。孤独耐性が高く、成果を積み上げて説得する。", strength:"一人で意思決定して進められる自走力がある。静かに勝ち筋を分析し、やるべきことを絞って確実に取りにいく。", weakness:"周りに頼るのが遅く、気づいた時には抱え込みになっていることがある。チーム戦の場だと「何考えてるかわからない」と誤解されやすい。"},
+      "LRRR": {name:"人柱テスター", summary:"まずはやってみる。失敗から学び、高速で正解に近づく。", description:"読み込みはするが、答えは現場で作るタイプ。変化の中で学習し、意義に共感できるなら突っ込める。準備より検証が早く、失敗から改善して勝ちに近づく。", strength:"まず試して学ぶのが早く、失敗を“データ化”して前に進める。新しいツールや施策の初動が速く、変化局面で強い。", weakness:"試しすぎて散らかりやすく、着地が曖昧になりがち。検証ログや目的が薄いと「ノリでやってる」に見えることがある。"},
+      "RLLL": {name:"避難所のモデレーター", summary:"人の話を引き出し、丁寧に合意を作って前進させる。", description:"会話で情報を集め、安定した枠組みの中で合意を作る。判断軸は「意義・人」で、計画的に場を整える。面接では対話力と調整力が刺さる。", strength:"会話で相手の本音と不安を引き出し、衝突を減らして合意形成できる。場の安全性を作るのが上手く、チームが荒れにくくなる。", weakness:"全員の納得を取りにいきすぎて、決断が遅れることがある。厳しい指摘や線引きをするときに、エネルギーを消耗しやすい。"},
+      "RLLR": {name:"全肯定ご自愛勢", summary:"その場の空気を読み、関わる全員が心地よい環境を作る。", description:"人と話しながら空気を読み、安定環境で安心感を提供する。意義・人を優先しつつ、進め方は柔軟で無理をしない。チームの温度を保ちながら前に進める。", strength:"人のコンディションを察知し、無理のない形に整えられる。安心感があり、周囲が本音を出しやすい“空気の安定装置”。", weakness:"優しさが強すぎて、言うべきことを飲み込みがち。衝突回避が続くと「結局どうしたいの？」と見られることがある。"},
+      "RLRL": {name:"界隈の神（解釈一致）", summary:"周りを巻き込みながら、目標に向かって着実に進む。", description:"対話で本音とニーズを掴み、変化のある場でも筋道を立てられる。動機は「意義・人」で、計画的に巻き込みながら進める。共感を“構造”に落として推進できる。", strength:"対話から価値観や文脈を読み取り、「それそれ」を言語化できる。共感を起点に人を巻き込み、計画に落として前に進める。", weakness:"期待に応えようとして背負いがちで、疲れが表に出にくい。理想の解釈を守ろうとして、現実の妥協にストレスが溜まることがある。"},
+      "RLRR": {name:"バイブス係長", summary:"トラブルも笑顔で解決。チームの熱量を上げるエンジン。", description:"会話で状況を取りにいき、カオス環境でノリ良く突破する。意義・人で動くが、計画に縛られず即興で回す。ムードメーカーなのに、実は修羅場耐性が高い。", strength:"場の温度を上げ、空気が重い局面でも動かせる。人を巻き込んで前進する力があり、変化のある環境で推進役になりやすい。", weakness:"勢いで走ると、詰め（根拠・段取り）が弱く見えることがある。テンションが落ちたときの反動が大きく、安定運用が苦手になりがち。"},
+      "RRLL": {name:"言語化の魔術師", summary:"大きな夢を、誰もが理解できる言葉と計画に落とす。", description:"対話から素材を拾い、変化の中でも意味を見失わない。意義・人を軸に、計画的に言葉と道筋に落とす。ESはストーリー設計、面接は納得感で勝つ。", strength:"感情や抽象を言葉にして、相手の理解と納得を作れる。対話で拾った素材を整理し、ストーリーとして筋を通すのが得意。", weakness:"言語化に時間をかけすぎて、行動が遅れることがある。言葉が鋭い分、相手によっては「刺さりすぎる」ことも。"},
+      "RRLR": {name:"フッ軽インフルエンサー", summary:"「面白そう！」で周りを巻き込み、変化の渦を作る。", description:"人から情報を集め、変化の波にすぐ乗る。動機は「意義・人」寄りで、進め方は即興。まず動いて発信し、反応を見て方向修正する。", strength:"迷う前に動けるスピードが武器で、反応を見ながら最適化できる。人と繋がって情報が集まりやすく、機会を拾う確率が高い。", weakness:"熱量のまま動くと、目的がブレて「やった感」に寄ることがある。仕込みが浅いまま前に出て、後から信用を積むのに苦労する場合も。"},
+      "RRRL": {name:"垢抜けプロデューサー", summary:"人と資源を集め、最短距離で成果を叩き出す実力派。", description:"対話で現場を掴み、カオス環境でも計画を引いて前進する。合理・成果を軸に意思決定し、勝てる形に整えるのが得意。伸び代を見抜いて改善を設計する。", strength:"対話で現状を掴み、最短で成果が出る形に整えられる。改善点を見つけて設計し、数字や結果で語れるのが強い。", weakness:"成果基準が明確すぎて、遅い人や曖昧な話にイライラしやすい。合理を優先して、共感の一言が足りないと誤解されることがある。"},
+      "RRRR": {name:"脳内ワンダーランド", summary:"どんな状況でも瞬時に最適解を出し、周りを驚かせる。", description:"会話で刺激を取り込み、カオス環境で即興的に形にする。合理・成果で最適解を選び、スピード重視で試す。アイデア量と決断の速さで場を動かす。", strength:"アイデアが連鎖して出てきて、場に新しい選択肢を増やせる。即興で組み替えるのが得意で、変化局面ほど頭が回る。", weakness:"発想が速すぎて、周りの理解が追いつかないことがある。着地（決め・続ける）が弱いと「結局何がしたいの？」になりやすい。"},
     };
 
     const STORAGE_KEY = "shukatsu_diag_apple_v1";
@@ -730,12 +730,39 @@ function gotoDiagnosisHome(){
   page: 0,
   answers: {},
   profile: { name: "", email: "" }, // 追加
+  questionOrder: null, // 質問の順番（シャッフル済みインデックス配列）
 };
 
 
     /***********************
      * Functions
      ***********************/
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function getQuestionOrder() {
+      // 既にシャッフル済みの順番があればそれを使用
+      if (state.questionOrder && state.questionOrder.length === QUESTIONS.length) {
+        return state.questionOrder;
+      }
+      // 初回のみシャッフル
+      const indices = Array.from({ length: QUESTIONS.length }, (_, i) => i);
+      state.questionOrder = shuffleArray(indices);
+      saveState();
+      return state.questionOrder;
+    }
+
+    function getShuffledQuestions() {
+      const order = getQuestionOrder();
+      return order.map(index => QUESTIONS[index]);
+    }
+
     function loadState(){
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -749,6 +776,7 @@ function gotoDiagnosisHome(){
       state.step = "intro";
       state.page = 0;
       state.answers = {};
+      state.questionOrder = null;
       localStorage.removeItem(STORAGE_KEY);
       render();
     }
@@ -868,9 +896,16 @@ const means = {};
       render();
     };
     document.getElementById("navDiagnosis").onclick = (e) => {
-  e.preventDefault();
-  gotoDiagnosisHome();
-};
+      e.preventDefault();
+      // 回答が完了している場合は結果画面を表示
+      const answered = Object.keys(state.answers).length;
+      if(answered >= QUESTIONS.length) {
+        state.step = "result";
+        render();
+      } else {
+        gotoDiagnosisHome();
+      }
+    };
 
     document.getElementById("navCharacters").onclick = (e) => {
       e.preventDefault();
@@ -930,18 +965,22 @@ const means = {};
       `;
       document.getElementById("btnStart").onclick = () => {
         state.step = "quiz";
+        // 質問の順番を確定（初回のみシャッフル）
+        getQuestionOrder();
         // 未回答の最初のページへ
-        const idx = QUESTIONS.findIndex(q => !state.answers[q.id]);
+        const shuffledQs = getShuffledQuestions();
+        const idx = shuffledQs.findIndex(q => !state.answers[q.id]);
         state.page = idx >= 0 ? Math.floor(idx / PAGE_SIZE) : 0;
         render();
       };
     }
 
     function renderQuiz(){
+      const shuffledQs = getShuffledQuestions();
       const start = state.page * PAGE_SIZE;
-      const currentQs = QUESTIONS.slice(start, start + PAGE_SIZE);
-      const totalPage = Math.ceil(QUESTIONS.length / PAGE_SIZE);
-      const progress = Math.round((Object.keys(state.answers).length / QUESTIONS.length) * 100);
+      const currentQs = shuffledQs.slice(start, start + PAGE_SIZE);
+      const totalPage = Math.ceil(shuffledQs.length / PAGE_SIZE);
+      const progress = Math.round((Object.keys(state.answers).length / shuffledQs.length) * 100);
 
       const qHtml = currentQs.map((q, i) => {
         const val = state.answers[q.id];
@@ -1005,7 +1044,8 @@ const means = {};
             saveState();
 
             // プログレスバーだけ更新
-            const p = Math.round((Object.keys(state.answers).length / QUESTIONS.length) * 100);
+            const shuffledQs = getShuffledQuestions();
+            const p = Math.round((Object.keys(state.answers).length / shuffledQs.length) * 100);
             document.querySelector(".progress-fill").style.width = p + "%";
             document.querySelector(".progress-meta span:last-child").innerText = p + "%";
           };
@@ -1063,7 +1103,8 @@ document.getElementById("btnPrev").onclick = () => {
 function renderGate(){
   // 回答が揃ってる前提だが、念のため
   const answered = Object.keys(state.answers).length;
-  if(answered < QUESTIONS.length){
+  const shuffledQs = getShuffledQuestions();
+  if(answered < shuffledQs.length){
     state.step = "quiz";
     saveState();
     render();
@@ -1308,13 +1349,20 @@ function renderGate(){
                     <span>一貫度 ${coh}%</span>
                     <span>${ax.right} ${right}%</span>
                   </div>
-                  <details class="axis-details">
-                    <summary>内訳を見る</summary>
-                    <div class="axis-breakdown">${rows}</div>
-                  </details>
                 </div>
               `;
             }).join("")}
+          </div>
+        </div>
+
+        <div style="margin-top:40px;">
+          <div class="panel fade-in" style="animation-delay:0.1s;">
+            <p class="kicker" style="margin-bottom:16px;">社会でのあなたの強み</p>
+            <p class="text-body" style="font-size:15px; line-height:1.8; margin:0;">${char.strength}</p>
+          </div>
+          <div class="panel fade-in" style="animation-delay:0.15s; margin-top:24px;">
+            <p class="kicker" style="margin-bottom:16px;">社会でのあなたの弱み</p>
+            <p class="text-body" style="font-size:15px; line-height:1.8; margin:0;">${char.weakness}</p>
           </div>
         </div>
 
